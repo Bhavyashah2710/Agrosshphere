@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced GSAP Showcase</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body class="antialiased opacity-0">
+    
+    <div id="preloader"><div class="preloader-text">Loading...</div></div>
+    <div id="cursor"><div id="cursor-dot"></div><div id="cursor-circle"></div></div>
+    <div id="page-transition-overlay">
+        <div class="transition-layer layer-1"></div>
+        <div class="transition-layer layer-2"></div>
+    </div>
+
+    <header class="fixed top-0 left-0 right-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-white">GSAP<span style="color: var(--gsap-green)">.io</span></div>
+             <ul class="flex space-x-6">
+                <li><a href="#hero-section" class="page-link text-gray-300 hover:text-white">Home</a></li>
+                <li><a href="#flip-gallery" class="page-link text-gray-300 hover:text-white">Gallery</a></li>
+                <li><a href="#interactive-path" class="page-link text-gray-300 hover:text-white">Path</a></li>
+                <li><a href="#showcase-3d" class="page-link text-gray-300 hover:text-white">3D</a></li>
+                <li><a href="#contact" class="page-link text-gray-300 hover:text-white">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section id="hero-section">
+            <div id="hero-grid"></div>
+            <div class="text-center">
+                <h1 class="hero-title">
+                    <div class="line"><span>Animate</span></div>
+                    <div class="line"><span>Everything</span></div>
+                </h1>
+                <div class="mt-8 hero-cta opacity-0">
+                    <a href="#flip-gallery" class="gsap-button magnetic">View Our Work</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marquee Section -->
+        <section class="marquee-section py-8">
+            <div class="marquee">
+                <div class="marquee-content">
+                     <span class="marquee-text">Creative Development</span>
+                     <span class="marquee-text">Interactive Design</span>
+                     <span class="marquee-text">Motion Graphics</span>
+                     <span class="marquee-text">Creative Development</span>
+                     <span class="marquee-text">Interactive Design</span>
+                     <span class="marquee-text">Motion Graphics</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flip Gallery Section -->
+        <section id="flip-gallery" class="content-section">
+            <div class="container mx-auto">
+                 <h2 class="section-title text-center text-5xl md:text-7xl font-bold mb-16">Interactive Gallery</h2>
+                 <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 gap-4">
+                     <div class="gallery-item-flip">
+                        <div class="gallery-item-overlay"></div>
+                        <h3 class="gallery-item-title">Collaboration</h3>
+                        <img src="https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Team collaborating around a table">
+                    </div>
+                     <div class="gallery-item-flip col-span-1 md:col-span-2">
+                        <div class="gallery-item-overlay"></div>
+                        <h3 class="gallery-item-title">Teamwork</h3>
+                        <img src="https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Team high-fiving in an office">
+                    </div>
+                     <div class="gallery-item-flip col-span-1 md:col-span-2">
+                        <div class="gallery-item-overlay"></div>
+                        <h3 class="gallery-item-title">Development</h3>
+                        <img src="https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Woman coding on a laptop">
+                    </div>
+                     <div class="gallery-item-flip">
+                        <div class="gallery-item-overlay"></div>
+                        <h3 class="gallery-item-title">Innovation</h3>
+                        <img src="https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Woman in a lab coat working with technology">
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+
+        <!-- Interactive Path Section -->
+        <section id="interactive-path" class="content-section bg-[#1a1a1a] min-h-screen">
+            <div class="container mx-auto text-center">
+                <h2 class="section-title text-5xl md:text-7xl font-bold mb-32">Follow the Path</h2>
+                <div class="relative w-full h-[500px]">
+                    <svg id="path-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 800 400">
+                        <path id="motion-path" d="M50,350 C150,50 350,50 450,200 S650,350 750,50" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none" />
+                    </svg>
+                    <div id="path-object" class="w-12 h-12 rounded-full absolute" style="background: var(--gsap-green);"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 3D Showcase Section -->
+        <section id="showcase-3d" class="content-section h-screen flex items-center justify-center overflow-hidden">
+            <div class="w-full h-full flex flex-col items-center justify-center text-center">
+                 <h2 class="section-title text-5xl md:text-7xl font-bold mb-4">Drag to Interact</h2>
+                 <p class="text-gray-400 mb-16">An interactive 3D object powered by GSAP Observer.</p>
+                 <div class="scene-3d w-[200px] h-[200px]">
+                     <div class="cube">
+                         <div class="face front"></div>
+                         <div class="face back"></div>
+                         <div class="face right"></div>
+                         <div class="face left"></div>
+                         <div class="face top"></div>
+                         <div class="face bottom"></div>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="contact" class="content-section text-center">
+            <div class="container mx-auto">
+                <h2 class="section-title text-5xl md:text-7xl font-bold">Have a project in mind?</h2>
+                <div class="mt-8 cta-button opacity-0">
+                    <a href="#" class="gsap-button magnetic text-xl">Let's Talk</a>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="py-8 text-center text-gray-500 border-t border-gray-800">
+            <p>&copy; 2025 GSAP.io Showcase</p>
+        </footer>
+
+    </main>
+    
+    <!-- GSAP (GreenSock Animation Platform) and plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Observer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
+    <!-- Lenis for smooth scroll -->
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script1.js"></script>
+</body>
+</html>
+

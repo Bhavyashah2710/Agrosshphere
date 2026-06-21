@@ -1,0 +1,281 @@
+/* --- Base & Typography --- */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Header Consistency --- */
+/* Ensures the header on these pages matches the original scrolled state */
+#navbar {
+    background-color: transparent; /* dark-bg with opacity */
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5); /* slate-700 with opacity */
+}
+
+#navbar #logo-btn {
+    color: #f1f5f9; /* text-light */
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    position: relative;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+.hero-image-container {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-image-container::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%);
+}
+
+.hero-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.05);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    padding: 1rem;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.hero-content p {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    color: #e2e8f0; /* slate-200 */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+
+/* --- Main Layout & Sticky Nav --- */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+
+@media (min-width: 1024px) {
+    .main-layout {
+        grid-template-columns: 250px 1fr;
+    }
+}
+
+.sidebar-nav {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .sidebar-nav {
+        display: block;
+    }
+}
+
+.page-nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    color: #475569; /* slate-600 */
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.page-nav-link:hover {
+    background-color: #e2e8f0; /* slate-200 */
+    color: #0f172a; /* text-dark */
+}
+
+.page-nav-link.active {
+    color: #16a34a; /* primary-dark */
+    font-weight: 600;
+    border-left-color: #22c55e; /* primary */
+    background-color: #dcfce7; /* green-100 */
+    transform: translateX(5px);
+}
+
+/* --- Rich Content Styling (Prose) --- */
+.content-prose {
+    max-width: 800px;
+}
+
+.content-section {
+    padding-bottom: 4rem;
+    margin-bottom: 4rem;
+    border-bottom: 1px solid #e2e8f0; /* slate-200 */
+}
+.content-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.content-prose h2 {
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: #2e462f; /* extra */
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #d1fae5; /* green-200 */
+    padding-bottom: 0.75rem;
+}
+
+.content-prose p, .content-prose li {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #334155; /* slate-700 */
+}
+
+/* --- Custom Components --- */
+.key-param-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    border-left: 5px solid #22c55e; /* primary */
+    display: flex;
+    align-items: center;
+}
+
+.param-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background-color: #dcfce7; /* green-100 */
+    color: #16a34a; /* primary-dark */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.check-item {
+    background-color: white;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    padding: 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.check-icon {
+    width: 24px;
+    height: 24px;
+    background-color: #22c55e; /* primary */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* --- Table Styling --- */
+.table-container {
+    overflow-x: auto;
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0; /* slate-200 */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+thead {
+    background-color: #f8fafc; /* slate-50 */
+}
+th {
+    font-weight: 600;
+    color: #1e293b; /* text-dark */
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+}
+
+/* --- Timeline Component --- */
+.timeline {
+    position: relative;
+    padding-left: 2.5rem;
+    border-left: 2px solid #d1fae5; /* green-200 */
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -2.5rem;
+    top: 0;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: #22c55e; /* primary */
+    border: 4px solid white;
+    border-radius: 50%;
+}
+
+/* --- Scroll Animations --- */
+.scroll-animate {
+    opacity: 0;
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.scroll-animate.animate-fade-in {
+    transform: translateY(20px);
+}
+.scroll-animate.animate-slide-up {
+    transform: translateY(40px);
+}
+.scroll-animate.animate-slide-in-left {
+    transform: translateX(-40px);
+}
+.scroll-animate.animate-slide-in-right {
+    transform: translateX(40px);
+}
+.scroll-animate.animate-zoom-in {
+    transform: scale(0.95);
+}
+
+.scroll-animate.visible {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}

@@ -1,0 +1,106 @@
+/* --- Base Styles --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f1f5f9; /* light-bg */
+}
+
+/* --- Price Card Styles (Updated) --- */
+.price-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.price-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569; /* slate-600 */
+    margin-bottom: 0.5rem;
+}
+
+.price-display {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a; /* text-dark */
+    line-height: 1.2;
+}
+
+.card-subtitle {
+    font-size: 0.875rem;
+    color: #64748b; /* slate-500 */
+    margin-top: 0.25rem;
+}
+
+/* Price Trend Specific Styles */
+.price-trend-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+.price-trend-display.up { color: #16a34a; }
+.price-trend-display.down { color: #dc2626; }
+
+
+/* --- Table Styles --- */
+.table-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+}
+
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.price-table th, .price-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.price-table th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.price-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.price-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* --- Loader --- */
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #FFF;
+    border-bottom-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+

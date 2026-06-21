@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Advisory - AgroSphere</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#22c55e',
+                        'primary-dark': '#16a34a',
+                        'secondary': '#f97316',
+                        'dark-bg': '#0f172a',
+                        'light-bg': '#f1f5f9',
+                        'text-dark': '#0f172a',
+                        'extra': '#2e462f',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+
+    <!-- Custom Stylesheet -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9; /* light-bg */
+        }
+
+        /* Form Styling */
+        .form-input, .form-select {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; transition: border-color 0.3s, box-shadow 0.3s; background-color: #ffffff;
+        }
+        .form-select {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.2em;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+        .form-label { display: block; font-weight: 500; color: #334155; margin-bottom: 0.5rem; }
+        .form-group { margin-bottom: 1rem; }
+
+        /* Result Section Styling */
+        .result-card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); overflow: hidden; }
+        .result-section-title { font-size: 1.5rem; font-weight: 700; color: #16a34a; padding-bottom: 0.5rem; border-bottom: 2px solid #dcfce7; margin-bottom: 1rem; }
+        
+        /* Accordion Styling for Details */
+        .details-accordion summary {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem; background-color: #f8fafc; border-radius: 0.5rem;
+            font-weight: 600; color: #1e293b; cursor: pointer; transition: background-color 0.3s;
+        }
+        .details-accordion summary:hover { background-color: #f1f5f9; }
+        .details-accordion .details-content { padding: 1rem; border-top: 1px solid #e2e8f0; }
+        .details-accordion summary::after {
+            content: '+'; font-size: 1.5rem; font-weight: 300; transition: transform 0.3s ease;
+        }
+        .details-accordion[open] > summary::after { transform: rotate(45deg); }
+        .details-accordion[open] > summary { background-color: #f1f5f9; }
+
+        /* Loader Animation */
+        .loader { width: 60px; height: 60px; border: 6px solid #dcfce7; border-top-color: #22c55e; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tabs Styling */
+        .tab-button { padding: 0.75rem 1.5rem; font-weight: 600; color: #475569; border-bottom: 4px solid transparent; transition: all 0.3s ease; }
+        .tab-button.active { color: #16a34a; border-bottom-color: #22c55e; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* General Chatbot styles */
+        .chat-window { background-color:#f1f5f9;border-radius:1rem;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);border:1px solid #e2e8f0; }
+        .chat-header{background-color:#0f172a;padding:1rem;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+        .chat-log{flex-grow:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.75rem}
+        .chat-log::-webkit-scrollbar{width:6px} .chat-log::-webkit-scrollbar-track{background:#e2e8f0} .chat-log::-webkit-scrollbar-thumb{background-color:#94a3b8;border-radius:3px}
+        .message{max-width:85%;padding:.75rem 1rem;border-radius:1rem;word-wrap:break-word;line-height:1.5}
+        .user-message{align-self:flex-end;background-color:#22c55e;color:white;border-bottom-right-radius:.25rem}
+        .bot-message{align-self:flex-start;background-color:white;color:#1e293b;border:1px solid #e2e8f0;border-bottom-left-radius:.25rem}
+        .chat-form{display:flex;padding:1rem;border-top:1px solid #e2e8f0;background-color:white;flex-shrink:0}
+        .user-input{flex-grow:1;border:1px solid #cbd5e1;border-radius:.5rem;padding:.5rem 1rem;font-size:1rem;transition:border-color .3s,box-shadow .3s}
+        .user-input:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+        .send-button{margin-left:.75rem;padding:.5rem;background-color:#22c55e;color:white;border:none;border-radius:.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .3s,transform .3s}
+        .send-button:hover{background-color:#16a34a;transform:scale(1.05)}
+        .typing-dots{display:flex;align-items:center;gap:4px}
+        .typing-dots span{width:8px;height:8px;background-color:#94a3b8;border-radius:50%;animation:bounce 1.4s infinite ease-in-out both}
+        .typing-dots span:nth-of-type(1){animation-delay:-.32s} .typing-dots span:nth-of-type(2){animation-delay:-.16s}
+        @keyframes bounce{0%,100%,80%{transform:scale(0)}40%{transform:scale(1)}}
+
+        /* Floating Chatbot */
+        #chatbot-container{position:fixed;bottom:2rem;right:2rem;z-index:1000}
+        #chat-bubble{width:64px;height:64px;background-color:#22c55e;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px 0 rgba(34,197,94,.39);transition:all .3s cubic-bezier(.4,0,.2,1)}
+        #chat-bubble:hover{background-color:#16a34a;transform:scale(1.1);box-shadow:0 10px 20px rgba(34,197,94,.3)}
+        #chat-window{position:absolute;bottom:80px;right:0;width:370px;height:500px;opacity:0;transform:translateY(20px) scale(.95);transition:all .4s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+        #chat-window.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+        #close-chat{font-size:2rem;line-height:1;background:none;border:none;cursor:pointer}
+    </style>
+</head>
+<body class="bg-light-bg">
+
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="flex items-center space-x-2 text-white transition-transform hover:scale-105">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="#16a34a" />
+                    <path
+                        d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                        fill="#22c55e" />
+                </svg>
+                <span class="text-2xl font-bold">AgroSphere</span>
+            </a>
+            <button id="sidebar-close-btn" class="sidebar-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-section-title">Tools</span>
+            <a href="leaftest.html" class="sidebar-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M14.5 14.5L21 21"></path>
+                    <circle cx="10" cy="10" r="8"></circle>
+                    <path d="M10.33 13.25s-1.5-2.5-3.5-2.5-3.5 2.5-3.5 2.5"></path>
+                    <path d="M12.5 7.5s-1.5-2.5-3.5-2.5S5.5 7.5 5.5 7.5"></path>
+                </svg>
+                <span>LeafLens Detection</span>
+            </a>
+            <a href="wether.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                </svg>
+                <span>Weather Forecast</span>
+            </a>
+            <a href="market.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <span>live prices</span>
+            </a>
+            <a href="advisory.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M12 2a5.2 5.2 0 0 0-4 8 5 5 0 0 0-4 4 5.2 5.2 0 0 0 4 8h8a5.2 5.2 0 0 0 4-8 5 5 0 0 0-4-4 5.2 5.2 0 0 0-4-8Z"></path>
+                    <path d="M12 2v4"></path>
+                    <path d="M12 18v4"></path>
+                    <path d="M20 12h-4"></path>
+                    <path d="M8 12H4"></path>
+                </svg>
+                <span>AI advisor</span>
+            </a>
+            <a href="pest_management.html" class="sidebar-link">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M12 18v-6" />
+                    <path d="M9.5 15a2.5 2.5 0 0 1 5 0" />
+                    <path d="M12 12a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+                </svg>
+                <span>Crop Planner</span>
+
+            </a>
+            <a href="product_analyzer.html" class="sidebar-link">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v2M8 4H6a2 2 0 0 0-2 2v2" />
+                    <path d="M8 20H6a2 2 0 0 1-2-2v-2M16 20h2a2 2 0 0 0 2-2v-2" />
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="m15 15-2.086-2.086" />
+                    <path d="M12 2v2M12 20v2M22 12h-2M4 12H2" />
+                </svg>
+                <span>product_analyzer</span>
+            </a>
+            <a href="gov_subsidy.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M12 22v-6"></path>
+                    <path d="M6 16v-6"></path>
+                    <path d="M18 16v-6"></path>
+                    <path d="M4 10h16"></path>
+                    <path d="M3 22h18"></path>
+                    <path d="M12 2L4 7v3h16V7L12 2z"></path>
+                </svg>
+                <span>Govt. Subsidies</span>
+            </a>
+
+
+            <div class="sidebar-dropdown">
+                <a href="#" class="sidebar-link sidebar-dropdown-toggle group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="sidebar-icon">
+                        <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                        </path>
+                        <path d="M2 9.27l10 2.5 10-2.5"></path>
+                        <path d="M12 17.77V22"></path>
+                    </svg>
+                    <span>Crops</span>
+                    <svg class="dropdown-arrow ml-auto h-5 w-5 transition-transform duration-300"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <div class="sidebar-submenu">
+                    <a href="banana_details.html" class="sidebar-submenu-link">Banana</a>
+                    <a href="muskmelon_details.html" class="sidebar-submenu-link">Muskmelon</a>
+                </div>
+            </div>
+
+            <span class="nav-section-title">Account</span>
+            <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>My Profile</span>
+            </a>
+            <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                    <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>&copy; 2025 AgroSphere</p>
+        </div>
+    </aside>
+    <header id="navbar" class="fixed top-0 left-0 w-full z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" id="logo-btn"
+                class="flex items-center space-x-2 text-white transition-transform hover:scale-105 z-50">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="#16a34a" />
+                    <path
+                        d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                        fill="#22c55e" />
+                </svg>
+                <span class="text-3xl font-bold">AgroSphere</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="advisory.html" class="nav-link">AI Advisor</a>
+                <a href="leaftest.html" class="nav-link">LeafLens</a>
+                <a href="pest_management.html" class="nav-link">Crop Planner</a>
+                <a href="gov_subsidy.html" class="nav-link">Subsidies</a>
+                <a href="market.html" class="nav-link">Market Prices</a>
+                <a href="wether.html" class="nav-link">Weather</a>
+                <a href="index.html#about" class="nav-link">About</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Auth Links - Swapped by JS -->
+                <div id="auth-links" class="flex items-center space-x-4">
+                    <a href="login.html" class="btn btn-outline hidden sm:block">Login</a>
+                    <a href="register.html" class="btn btn-solid">Register</a>
+                </div>
+                <!-- User Profile - Hidden by default -->
+                <div id="user-profile" class="hidden items-center space-x-4">
+                    <span id="user-email" class="text-sm font-semibold"></span>
+                    <button id="logout-btn" class="btn btn-outline">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 mt-16">
+        <section id="advisory-form-section">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-extra">Crop Recommendation Advisor</h1>
+                <p class="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">Enter your farm's details to get AI-powered recommendations for the most suitable crops, tailored to your conditions.</p>
+            </div>
+
+            <form id="advisory-form" class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                    <!-- Column 1 -->
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Location & Planting</h3>
+                        <div class="form-group">
+                            <label for="location" class="form-label">City / District</label>
+                            <input type="text" id="location" name="location" class="form-input" placeholder="e.g., Nashik" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plantation-time" class="form-label">Specific Planting Date</label>
+                            <input type="date" id="plantation-time" name="plantation-time" class="form-input" required>
+                        </div>
+                    </div>
+                    <!-- Column 2 -->
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Soil Details</h3>
+                         <div class="form-group">
+                            <label for="soil-type" class="form-label">Soil Type</label>
+                            <select id="soil-type" name="soil-type" class="form-select" required>
+                                <option value="" disabled selected>Select soil type</option>
+                                <option value="Alluvial">Alluvial (जलोढ़ / કાંપવાળી)</option>
+                                <option value="Black">Black (काली / કાળી)</option>
+                                <option value="Red and Yellow">Red & Yellow (लाल और पीली / લાલ અને પીળી)</option>
+                                <option value="Laterite">Laterite (लैटेराइट / પડખાવ)</option>
+                                <option value="Arid">Arid (शुष्क / શુષ્ક)</option>
+                                <option value="Saline">Saline (लवणीय / ખારી)</option>
+                                <option value="Peaty">Peaty (पीटमय / પીટ)</option>
+                                <option value="Forest">Forest (वन / વન)</option>
+                                <option value="Sandy">Sandy (रेतीली / રેતાળ)</option>
+                                <option value="Clay">Clay (चिकनी / માટી)</option>
+                                <option value="Loamy">Loamy (दोमट / લોમ)</option>
+                                <option value="Sandy Loam">Sandy Loam (रेतीली दोमट / રેતાળ લોમ)</option>
+                                <option value="Clay Loam">Clay Loam (चिकनी दोमट / માટી લોમ)</option>
+                                <option value="Silty Loam">Silty Loam (गादयुक्त दोमट / કાંપવાળી લોમ)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label for="soil-ph" class="form-label">Soil pH (Optional)</label>
+                                <input type="number" step="0.1" id="soil-ph" name="soil-ph" class="form-input" placeholder="e.g., 6.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="soil-ec" class="form-label">Soil EC (dS/m) (Opt.)</label>
+                                <input type="number" step="0.1" id="soil-ec" name="soil-ec" class="form-input" placeholder="e.g., 1.2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <button type="submit" id="get-recommendation-btn" class="bg-primary text-white font-bold py-3 px-12 rounded-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 shadow-lg">Get Recommendations</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="result-section" class="mt-16 hidden">
+            <div id="loader" class="text-center py-12 hidden"><div class="loader mx-auto"></div><p class="mt-4 text-lg font-semibold text-gray-600">Analyzing your farm data & fetching weather... Please wait.</p></div>
+            <div id="error-message" class="text-center py-12 hidden"><p class="text-lg font-semibold text-red-600">Sorry, something went wrong. Could you please try again with more specific details?</p></div>
+            <div id="result-content" class="hidden"></div>
+        </section>
+        
+        <!-- NEW Follow-up Chat Section -->
+        <section id="follow-up-chat-section" class="mt-16 hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-extra">Have More Questions?</h2>
+                <p class="text-gray-600 mt-2">Ask our AI assistant for more details about your recommended crops.</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div id="follow-up-chat-window" class="chat-window" style="height: 500px;">
+                    <div id="follow-up-chat-log" class="chat-log"></div>
+                    <div id="follow-up-typing-indicator" class="hidden"><div class="message bot-message"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>
+                    <form id="follow-up-chat-form" class="chat-form">
+                        <input type="text" id="follow-up-user-input" class="user-input" placeholder="Ask about fertilizer, pests, etc..." autocomplete="off">
+                        <button type="submit" class="send-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Floating Chatbot Container -->
+    <div id="chatbot-container">
+        <div id="chat-bubble" class="shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                 <div class="flex items-center space-x-3"><div class="w-12 h-12 bg-dark-bg rounded-full flex items-center justify-center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#16a34a"/><path d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z" fill="#22c55e"/></svg></div><div><h3 class="font-bold text-white text-lg">AgroSphere AI Assistant</h3><p class="text-sm text-green-200">Online</p></div></div>
+                <button id="close-chat" class="text-slate-300 hover:text-white">&times;</button>
+            </div>
+            <div id="chat-log" class="chat-log"></div>
+            <div id="typing-indicator" class="hidden"><div class="message bot-message"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="user-input" class="user-input" placeholder="Ask a general question..." autocomplete="off">
+                <button type="submit" class="send-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-dark-bg text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                                fill="#16a34a"></path>
+                            <path
+                                d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                                fill="#22c55e"></path>
+                        </svg>
+                        <span class="text-2xl font-bold">AgroSphere</span>
+                    </a>
+                    <p class="mt-4 text-gray-400">Pioneering the future of agriculture with data-driven insights and
+                        sustainable practices.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Quick Links</h4>
+                    <div class="flex space-x-8">
+                        <ul class="space-y-2">
+                            <li><a href="index.html" class="hover:text-primary transition">Home</a></li>
+                            <li><a href="advisory.html" class="hover:text-primary transition">AI Advisor</a></li>
+                            <li><a href="leaftest.html" class="hover:text-primary transition">LeafLens</a></li>
+                            <li><a href="pest_management.html" class="hover:text-primary transition">Crop Planner</a></li>
+                            <li><a href="gov_subsidy.html" class="hover:text-primary transition">Subsidies</a></li>
+                        </ul>
+                        <ul class="space-y-2">
+                            <li><a href="market.html" class="hover:text-primary transition">Market Prices</a></li>
+                            <li><a href="wether.html" class="hover:text-primary transition">Weather</a></li>
+                            <li><a href="index.html#about" class="hover:text-primary transition">About</a></li>
+                            <li><a href="index.html#contact" class="hover:text-primary transition">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start"><span class="mr-2 mt-1">📍</span> 123 AgriTech Avenue, Green
+                            Valley, State 12345</li>
+                        <li class="flex items-center"><span class="mr-2">📞</span> +1 (555) 123-4567</li>
+                        <li class="flex items-center"><span class="mr-2">✉️</span> info@agrosphere.com</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M22.675 0h-21.35C.602 0 0 .602 0 1.348v21.304C0 23.398.602 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h5.713c.722 0 1.325-.602 1.325-1.348V1.348C24 .602 23.398 0 22.675 0z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.223.085c.645 1.956 2.52 3.379 4.734 3.419-1.71 1.332-3.86 2.125-6.204 2.125-.402 0-.799-.023-1.19-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.668-.072-4.948-.2-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
+                            </svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-500">
+                <p>&copy; 2025 AgroSphere. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- SIMULATED WEATHER API ---
+    function fetchWeatherInfo(location) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const mockWeather = {
+                    summary: `The forecast for ${location} for the upcoming season indicates moderate rainfall, with average temperatures between 25-32°C and humidity around 70%.`,
+                };
+                resolve(mockWeather);
+            }, 1500);
+        });
+    }
+
+    // --- DOM ELEMENT REFERENCES ---
+    const advisoryForm = document.getElementById('advisory-form');
+    const resultSection = document.getElementById('result-section');
+    const loader = document.getElementById('loader');
+    const errorMessage = document.getElementById('error-message');
+    const resultContent = document.getElementById('result-content');
+    const floatingChatbotContainer = document.getElementById('chatbot-container');
+    const followUpChatSection = document.getElementById('follow-up-chat-section');
+    let recommendedCropNames = [];
+
+    // --- FORM SUBMISSION LOGIC ---
+    advisoryForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        resultSection.classList.remove('hidden');
+        resultContent.innerHTML = '';
+        followUpChatSection.classList.add('hidden');
+        resultContent.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        loader.classList.remove('hidden');
+        document.getElementById('get-recommendation-btn').disabled = true;
+
+        const formData = new FormData(advisoryForm);
+        const location = formData.get('location');
+
+        try {
+            const weather = await fetchWeatherInfo(location);
+            const userInput = { location, plantationTime: formData.get('plantation-time'), soilType: formData.get('soil-type'), soilPh: formData.get('soil-ph') || 'Not provided', soilEc: formData.get('soil-ec') || 'Not provided', weatherSummary: weather.summary };
+            
+            const response = await getCropRecommendation(userInput);
+            renderResults(response);
+            recommendedCropNames = response.map(crop => crop.recommendedCrop.name);
+
+        } catch (error) {
+            console.error('Error in advisory process:', error);
+            loader.classList.add('hidden');
+            const errorElement = document.getElementById('error-message').querySelector('p');
+            
+            if (error.message.includes('401')) {
+                errorElement.textContent = "Authentication Failed (Error 401). Could not connect to the AI service. This is often due to an invalid or missing API key.";
+            } else if (error.message.includes('403')) {
+                 errorElement.textContent = "Permission Denied (Error 403). Please ensure the API key has the correct permissions for the Gemini API.";
+            } else {
+                errorElement.textContent = "An unexpected error occurred. Please try again later or refine your query.";
+            }
+            
+            errorMessage.classList.remove('hidden');
+        } finally {
+            document.getElementById('get-recommendation-btn').disabled = false;
+        }
+    });
+
+    // --- GEMINI API CALL LOGIC ---
+    async function getCropRecommendation(userInput) {
+        // --- IMPORTANT: PASTE YOUR API KEY HERE ---
+        // You can get a free key from Google AI Studio.
+        const apiKey = "AIzaSyAVH1BmP-_sIC0KI03-ttahIBebHYKFOKY"; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        // FIX: Check for API key before making the call.
+        if (!apiKey) {
+            throw new Error("API Error: 401"); 
+        }
+
+        const systemPrompt = `You are a world-class Indian agronomist. Your task is to provide the top 3 crop recommendations based on user input. For each recommendation, you MUST provide extremely detailed, practical, and beginner-friendly information. Every single field in the JSON schema must be filled with a helpful, brief explanation. Your response MUST be ONLY a valid JSON array adhering to the schema. Do not add any extra text or markdown.`;
+        
+        const userQuery = `Analyze these farming conditions in India and provide the top 3 crop recommendations:
+            - Location: ${userInput.location}
+            - Weather Forecast: ${userInput.weatherSummary}
+            - Soil Type: ${userInput.soilType}
+            - Proposed Plantation Date: ${userInput.plantationTime}
+            - Soil pH: ${userInput.soilPh}
+            - Soil EC (dS/m): ${userInput.soilEc}`;
+
+        const jsonSchema = {
+            type: "ARRAY", items: { type: "OBJECT", properties: {
+                "recommendedCrop": { type: "OBJECT", properties: { "name": { "type": "STRING" }, "scientificName": { "type": "STRING" }, "suitabilityReason": { "type": "STRING" }, "imageUrl": { "type": "STRING" } }},
+                "cultivationGuide": { type: "ARRAY", items: { type: "OBJECT", properties: { "stage": { "type": "STRING" }, "summary": { "type": "STRING" }, "detailedExplanation": { "type": "STRING" } }}},
+                "pestAndDiseaseManagement": { type: "ARRAY", items: { type: "OBJECT", properties: {
+                    "name": { "type": "STRING" }, "type": { "type": "STRING" }, 
+                    "description": { "type": "STRING" }, 
+                    "chemicalControl": { "type": "STRING" },
+                    "biologicalControl": { "type": "STRING" }
+                }}},
+                "inDepthCropDetails": { type: "ARRAY", items: { type: "OBJECT", properties: {
+                    "topic": { "type": "STRING" },
+                    "details": { "type": "STRING" }
+                }}},
+                "waterManagement": { type: "OBJECT", properties: {
+                    "floodIrrigation": { type: "OBJECT", properties: { "schedule": { type: "ARRAY", items: { type: "OBJECT", properties: { "stage": { "type": "STRING" }, "frequency": { "type": "STRING" }, "explanation": { "type": "STRING"} }}}, "overallStrategy": { "type": "STRING"} }},
+                    "dripIrrigation": { type: "OBJECT", properties: { "schedule": { type: "ARRAY", items: { type: "OBJECT", properties: { "stage": { "type": "STRING" }, "duration": { "type": "STRING" }, "explanation": { "type": "STRING"} }}}, "overallStrategy": { "type": "STRING"} }}
+                }},
+                "fertilizerPlan": { type: "OBJECT", properties: {
+                    "solidFertilizers": { type: "OBJECT", properties: {
+                        "basalDose": { type: "ARRAY", items: { type: "OBJECT", properties: { "fertilizer": { "type": "STRING" }, "amount": { "type": "STRING" }, "explanation": { "type": "STRING"} }}},
+                        "topDressing": { type: "ARRAY", items: { type: "OBJECT", properties: { "fertilizer": { "type": "STRING" }, "timing": { "type": "STRING" }, "amount": { "type": "STRING" }, "explanation": { "type": "STRING"} }}}
+                    }},
+                    "dripFertigation": { type: "OBJECT", properties: { "schedule": { type: "ARRAY", items: { type: "OBJECT", properties: { "days": { "type": "STRING" }, "fertilizer": { "type": "STRING" }, "amount": { "type": "STRING" }, "explanation": { "type": "STRING"} }}} }}
+                }},
+                "harvesting": { type: "OBJECT", properties: { "timingAndSigns": { "type": "STRING" }, "method": { "type": "STRING" } }}
+            }}
+        };
+        const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: jsonSchema } };
+        const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        const result = await response.json();
+        return JSON.parse(result.candidates[0].content.parts[0].text);
+    }
+
+    // --- RENDER RESULTS LOGIC ---
+    function renderResults(data) {
+        if (!data || data.length === 0) { errorMessage.classList.remove('hidden'); loader.classList.add('hidden'); return; }
+        const tabsHTML = data.map((crop, index) => `<button class="tab-button ${index === 0 ? 'active' : ''}" data-tab="crop-${index}">${crop.recommendedCrop.name}</button>`).join('');
+        const contentHTML = data.map((cropData, index) => {
+            const { recommendedCrop, cultivationGuide, pestAndDiseaseManagement, inDepthCropDetails, waterManagement, fertilizerPlan, harvesting } = cropData;
+            return `<div id="crop-${index}" class="tab-content ${index === 0 ? 'active' : ''}">
+                <div class="result-card">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8"><div class="lg:col-span-1"><img src="${recommendedCrop.imageUrl || 'https://placehold.co/600x400/22c55e/ffffff?text=Crop+Image'}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/22c55e/ffffff?text=Image+Not+Found';" alt="${recommendedCrop.name}" class="rounded-lg shadow-md object-cover w-full h-64"></div><div class="lg:col-span-2"><p class="text-sm font-semibold text-primary uppercase tracking-wide">Optimal Crop Recommendation</p><h2 class="text-4xl font-extrabold text-text-dark mt-1">${recommendedCrop.name}</h2><p class="text-lg text-gray-500 italic">${recommendedCrop.scientificName}</p><p class="mt-4 text-gray-700">${recommendedCrop.suitabilityReason}</p></div></div>
+                    <div class="p-8 border-t"><h3 class="result-section-title">Cultivation Guide</h3><div class="space-y-3">${cultivationGuide.map(step => `<details class="details-accordion"><summary>${step.stage}</summary><div class="details-content text-gray-600"><p>${step.detailedExplanation}</p></div></details>`).join('')}</div></div>
+                    <div class="p-8 bg-gray-50 border-t"><h3 class="result-section-title">In-Depth Crop Details</h3><div class="space-y-3">${inDepthCropDetails.map(item => `<details class="details-accordion"><summary>${item.topic}</summary><div class="details-content text-gray-600"><p>${item.details}</p></div></details>`).join('')}</div></div>
+                    <div class="p-8 border-t"><h3 class="result-section-title">Pest & Disease Management</h3><div class="space-y-3">${pestAndDiseaseManagement.map(item => `<details class="details-accordion"><summary>${item.name} <span class="text-xs font-bold py-1 px-2 rounded-full ${item.type.toLowerCase() === 'pest' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">${item.type}</span></summary><div class="details-content text-gray-600"><p class="font-semibold text-gray-800">About:</p><p class="mb-3">${item.description}</p><p class="font-semibold text-gray-800">Biological Control:</p><p class="mb-3">${item.biologicalControl}</p><p class="font-semibold text-gray-800">Chemical Control:</p><p>${item.chemicalControl}</p></div></details>`).join('')}</div></div>
+                    <div class="p-8 bg-gray-50 border-t"><h3 class="result-section-title">Water Management</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h4 class="font-bold text-lg text-gray-800">Flood Irrigation</h4><p class="text-sm text-gray-500 mb-3">${waterManagement.floodIrrigation.overallStrategy}</p><div class="space-y-2">${waterManagement.floodIrrigation.schedule.map(s => `<details class="details-accordion text-sm"><summary>${s.stage}</summary><div class="details-content text-gray-600"><p><strong>Frequency:</strong> ${s.frequency}</p><p class="mt-2">${s.explanation}</p></div></details>`).join('')}</div></div><div><h4 class="font-bold text-lg text-gray-800">Drip Irrigation</h4><p class="text-sm text-gray-500 mb-3">${waterManagement.dripIrrigation.overallStrategy}</p><div class="space-y-2">${waterManagement.dripIrrigation.schedule.map(s => `<details class="details-accordion text-sm"><summary>${s.stage}</summary><div class="details-content text-gray-600"><p><strong>Schedule:</strong> ${s.duration}</p><p class="mt-2">${s.explanation}</p></div></details>`).join('')}</div></div></div></div>
+                    <div class="p-8 border-t"><h3 class="result-section-title">Fertilizer Plan</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8"><div><h4 class="font-bold text-lg text-gray-800">Solid Fertilizers</h4><div class="space-y-2 mt-3"><h5 class="font-semibold">Basal Dose (at planting)</h5>${fertilizerPlan.solidFertilizers.basalDose.map(f => `<details class="details-accordion text-sm"><summary>${f.fertilizer} (${f.amount})</summary><div class="details-content text-gray-600">${f.explanation}</div></details>`).join('')}<h5 class="font-semibold mt-4">Top Dressing</h5>${fertilizerPlan.solidFertilizers.topDressing.map(f => `<details class="details-accordion text-sm"><summary>${f.fertilizer} (${f.timing})</summary><div class="details-content text-gray-600"><p><strong>Amount:</strong> ${f.amount}</p><p class="mt-2">${f.explanation}</p></div></details>`).join('')}</div></div><div><h4 class="font-bold text-lg text-gray-800">Drip Fertigation (Water Soluble)</h4><div class="space-y-2 mt-3">${fertilizerPlan.dripFertigation.schedule.map(f => `<details class="details-accordion text-sm"><summary>${f.days}</summary><div class="details-content text-gray-600"><p><strong>Fertilizer:</strong> ${f.fertilizer}</p><p><strong>Amount:</strong> ${f.amount}</p><p class="mt-2">${f.explanation}</p></div></details>`).join('')}</div></div></div></div>
+                    <div class="p-8 bg-gray-50 border-t"><h3 class="result-section-title">Harvesting</h3><h4 class="font-bold text-lg text-gray-800">Timing & Signs</h4><p class="text-gray-600 mt-2">${harvesting.timingAndSigns}</p><h4 class="font-bold text-lg text-gray-800 mt-4">Method</h4><p class="text-gray-600 mt-2">${harvesting.method}</p></div>
+                </div>
+            </div>`;
+        }).join('');
+        
+        resultContent.innerHTML = `<div class="bg-white p-4 rounded-lg shadow-md"><div class="border-b border-gray-200"><nav class="-mb-px flex flex-wrap" id="result-tabs">${tabsHTML}</nav></div><div class="mt-4">${contentHTML}</div></div>`;
+        loader.classList.add('hidden');
+        resultContent.classList.remove('hidden');
+        resultContent.scrollIntoView({ behavior: 'smooth' });
+        
+        // Show follow-up chat and hide floating bubble
+        floatingChatbotContainer.classList.add('hidden');
+        followUpChatSection.classList.remove('hidden');
+
+        document.querySelectorAll('.tab-button').forEach(button => { button.addEventListener('click', function() { document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active')); this.classList.add('active'); document.getElementById(this.dataset.tab).classList.add('active'); }); });
+    }
+
+    // --- CHATBOTS LOGIC ---
+    function setupChatbot(config) {
+        const chatWindow = document.getElementById(config.windowId);
+        const chatLog = document.getElementById(config.logId);
+        const chatForm = document.getElementById(config.formId);
+        const userInput = document.getElementById(config.inputId);
+        const typingIndicator = document.getElementById(config.typingId);
+
+        const addMessage = (sender, text) => {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', `${sender}-message`);
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            messageElement.innerHTML = text;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
+
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userText = userInput.value.trim();
+            if (userText) { addMessage('user', userText); userInput.value = ''; getChatbotResponse(userText, addMessage, typingIndicator); }
+        });
+
+        // Add initial message if provided
+        if (config.initialMessage) {
+             setTimeout(() => { addMessage('bot', config.initialMessage); }, 1000);
+        }
+        return { addMessage };
+    }
+    
+    // Setup for floating chatbot
+    const floatingChatBubble = document.getElementById('chat-bubble');
+    const floatingChatWindow = document.getElementById('chat-window');
+    const floatingCloseChat = document.getElementById('close-chat');
+    
+    floatingChatBubble.addEventListener('click', () => floatingChatWindow.classList.toggle('open'));
+    floatingCloseChat.addEventListener('click', () => floatingChatWindow.classList.toggle('open'));
+
+    setupChatbot({
+        windowId: 'chat-window', logId: 'chat-log', formId: 'chat-form',
+        inputId: 'user-input', typingId: 'typing-indicator',
+        initialMessage: 'Welcome! Ask a general question or fill out the form for a detailed recommendation.'
+    });
+
+    // Setup for follow-up chatbot
+    const followUpChat = setupChatbot({
+        windowId: 'follow-up-chat-window', logId: 'follow-up-chat-log', formId: 'follow-up-chat-form',
+        inputId: 'follow-up-user-input', typingId: 'follow-up-typing-indicator',
+        initialMessage: 'Your recommendations are ready. Feel free to ask more detailed questions about them here.'
+    });
+
+
+    async function getChatbotResponse(userText, addMessageCallback, typingIndicator) {
+        typingIndicator.classList.remove('hidden');
+        typingIndicator.parentElement.scrollTop = typingIndicator.parentElement.scrollHeight;
+
+        const apiKey = "AIzaSyAVH1BmP-_sIC0KI03-ttahIBebHYKFOKY"; // This should be populated with your key for testing
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        
+        let systemPrompt = `You are "AgroSphere AI Assistant," a friendly and professional agronomist. Your goal is to provide helpful, accurate, and encouraging advice.`;
+        if (recommendedCropNames.length > 0) {
+            systemPrompt += ` The user has just received recommendations for the following crops: ${recommendedCropNames.join(', ')}. Please prioritize answering detailed follow-up questions about these specific crops, using your expert knowledge.`;
+        }
+        
+        const payload = { contents: [{ parts: [{ text: userText }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, tools: [{ "google_search": {} }] };
+
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+            const result = await response.json();
+            const botText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't process that. Could you try asking in a different way?";
+            addMessageCallback('bot', botText);
+        } catch (error) {
+            console.error("AI Chatbot Error:", error);
+            addMessageCallback('bot', "I'm having a little trouble connecting right now. Please try again in a moment.");
+        } finally {
+            typingIndicator.classList.add('hidden');
+        }
+    }
+});
+</script>
+<script src="script.js"></script>
+
+
+</body>
+</html>
+

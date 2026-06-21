@@ -1,0 +1,369 @@
+/* Base Styles */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Static Header Styles (for detail pages) */
+.nav-link-static {
+    position: relative;
+    color: #e2e8f0; /* slate-200 */
+    font-weight: 500;
+    transition: color 0.3s;
+}
+.nav-link-static:hover {
+    color: #ffffff; /* Bright white on hover */
+}
+.nav-link-static::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -6px;
+    left: 50%;
+    background-color: #22c55e; /* primary */
+    transition: width 0.3s ease-in-out, left 0.3s ease-in-out;
+    border-radius: 1px;
+}
+.nav-link-static:hover::after {
+    width: 100%;
+    left: 0;
+}
+.btn-outline-static {
+    border: 2px solid #94a3b8;
+    color: #e2e8f0;
+}
+.btn-outline-static:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-color: #ffffff;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Page Layout Fix */
+.main-content-area {
+    position: relative;
+    z-index: 20; /* Ensures this content is above the hero section */
+    background-color: #f1f5f9; /* Matches light-bg color */
+}
+
+
+/* Page Layout */
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a; /* text-dark */
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid #dcfce7; /* green-100 */
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.section-paragraph {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #475569; /* slate-600 */
+}
+
+/* Sidebar Navigation */
+.nav-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: #475569; /* slate-600 */
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+.nav-item:hover {
+    background-color: #e2e8f0; /* slate-200 */
+    color: #0f172a; /* text-dark */
+    transform: translateX(5px);
+}
+.nav-item.active {
+    background-color: #dcfce7; /* green-100 */
+    color: #16a34a; /* primary-dark */
+    border-left-color: #22c55e; /* primary */
+}
+
+/* Parameter Cards */
+.param-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+}
+.param-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+    border-color: #22c55e;
+}
+.param-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background-color: #dcfce7; /* green-100 */
+    color: #16a34a; /* primary-dark */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+.param-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #1e293b; /* text-dark */
+}
+.param-text {
+    color: #475569; /* slate-600 */
+}
+
+/* Table Styles */
+.table-header {
+    padding: 0.75rem 1rem;
+    background-color: #f1f5f9;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 2px solid #e2e8f0;
+}
+.table-cell {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+tbody tr:last-child .table-cell {
+    border-bottom: none;
+}
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Timeline Graphic for Muskmelon Page */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    bottom: 5px;
+    width: 4px;
+    background: #dcfce7; /* green-100 */
+    border-radius: 2px;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+.timeline-dot {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 4px solid #22c55e; /* primary */
+    border-radius: 50%;
+}
+
+/* Animation Styles */
+.scroll-animate {
+    opacity: 0;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.animate-fade-in {
+    transform: translateY(20px);
+}
+.animate-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.animate-slide-up {
+    transform: translateY(40px);
+}
+.animate-slide-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.animate-slide-in-left {
+    transform: translateX(-40px);
+}
+.animate-slide-in-left.visible {
+     opacity: 1;
+    transform: translateX(0);
+}
+.animate-slide-in-right {
+    transform: translateX(40px);
+}
+.animate-slide-in-right.visible {
+     opacity: 1;
+    transform: translateX(0);
+}
+.animate-zoom-in {
+    transform: scale(0.9);
+}
+.animate-zoom-in.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+.timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+/* The vertical line */
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background-color: #e2e8f0; /* slate-200 */
+    border-radius: 2px;
+}
+
+.timeline-item {
+    padding: 1rem 3rem;
+    position: relative;
+    width: 50%;
+}
+
+/* Position items on alternating sides */
+.timeline-item:nth-child(odd) {
+    left: 0;
+    padding-left: 0;
+}
+
+.timeline-item:nth-child(even) {
+    left: 50%;
+    padding-right: 0;
+}
+
+/* The circular dot on the timeline */
+.timeline-dot {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 4px solid #22c55e; /* primary */
+    top: 24px;
+    border-radius: 50%;
+    z-index: 1;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.timeline-item:nth-child(odd) .timeline-dot {
+    right: -10px;
+}
+
+.timeline-item:nth-child(even) .timeline-dot {
+    left: -10px;
+}
+
+/* The content card */
+.timeline-content {
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    position: relative;
+    border: 1px solid #f1f5f9; /* light-bg */
+}
+
+/* The triangular pointer (caret) on the content card */
+.timeline-content::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    border: medium solid white;
+}
+
+.timeline-item:nth-child(odd) .timeline-content::before {
+    right: -10px;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent white;
+}
+
+.timeline-item:nth-child(even) .timeline-content::before {
+    left: -10px;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent white transparent transparent;
+}
+
+
+/* =================================== */
+/* =========== TIMELINE ANIMATIONS =========== */
+/* These work with your existing JS */
+/* =================================== */
+
+/* Initial state for slide-in animations */
+.animate-slide-in-left,
+.animate-slide-in-right {
+    opacity: 0;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+    transform: translateX(50px);
+}
+.animate-slide-in-right {
+    transform: translateX(-50px);
+}
+
+/* Final state when 'visible' class is added by JS */
+.scroll-animate.visible.animate-slide-in-left,
+.scroll-animate.visible.animate-slide-in-right {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* =================================== */
+/* =========== RESPONSIVE (MOBILE VIEW) =========== */
+/* =================================== */
+@media screen and (max-width: 768px) {
+    .timeline::before {
+        left: 20px; /* Move line to the left */
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 50px;
+        padding-right: 15px;
+    }
+    
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        left: 0; /* Stack all items on the right side */
+    }
+
+    .timeline-dot {
+        top: 24px;
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-dot,
+    .timeline-item:nth-child(even) .timeline-dot {
+        left: 10px; /* Move all dots onto the left-aligned line */
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-content::before,
+    .timeline-item:nth-child(even) .timeline-content::before {
+        left: -10px;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent white transparent transparent;
+    }
+}

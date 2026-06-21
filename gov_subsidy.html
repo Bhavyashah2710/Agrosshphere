@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Schemes & Subsidies - AgroSphere</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'poppins': ['Poppins', 'sans-serif'] },
+                    colors: {
+                        'primary': '#22c55e', 'primary-dark': '#16a34a', 'secondary': '#f97316',
+                        'dark-bg': '#0f172a', 'light-bg': '#f1f5f9', 'text-dark': '#0f172a',
+                        'extra': '#2e462f',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
+        .scheme-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .scheme-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: #22c55e;
+        }
+        .scheme-card .icon-wrapper {
+            transition: transform 0.3s ease-in-out;
+        }
+        .scheme-card:hover .icon-wrapper {
+            transform: scale(1.1);
+        }
+        
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-light-bg">
+
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="flex items-center space-x-2 text-white transition-transform hover:scale-105">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="#16a34a" />
+                    <path
+                        d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                        fill="#22c55e" />
+                </svg>
+                <span class="text-2xl font-bold">AgroSphere</span>
+            </a>
+            <button id="sidebar-close-btn" class="sidebar-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-section-title">Tools</span>
+            <a href="leaftest.html" class="sidebar-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M14.5 14.5L21 21"></path>
+                    <circle cx="10" cy="10" r="8"></circle>
+                    <path d="M10.33 13.25s-1.5-2.5-3.5-2.5-3.5 2.5-3.5 2.5"></path>
+                    <path d="M12.5 7.5s-1.5-2.5-3.5-2.5S5.5 7.5 5.5 7.5"></path>
+                </svg>
+                <span>LeafLens Detection</span>
+            </a>
+            <a href="wether.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                </svg>
+                <span>Weather Forecast</span>
+            </a>
+            <a href="market.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <span>live prices</span>
+            </a>
+            <a href="advisory.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M12 2a5.2 5.2 0 0 0-4 8 5 5 0 0 0-4 4 5.2 5.2 0 0 0 4 8h8a5.2 5.2 0 0 0 4-8 5 5 0 0 0-4-4 5.2 5.2 0 0 0-4-8Z"></path>
+                    <path d="M12 2v4"></path>
+                    <path d="M12 18v4"></path>
+                    <path d="M20 12h-4"></path>
+                    <path d="M8 12H4"></path>
+                </svg>
+                <span>AI advisor</span>
+            </a>
+            <a href="pest_management.html" class="sidebar-link">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M12 18v-6" />
+                    <path d="M9.5 15a2.5 2.5 0 0 1 5 0" />
+                    <path d="M12 12a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+                </svg>
+                <span>Crop Planner</span>
+
+            </a>
+            <a href="product_analyzer.html" class="sidebar-link">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v2M8 4H6a2 2 0 0 0-2 2v2" />
+                    <path d="M8 20H6a2 2 0 0 1-2-2v-2M16 20h2a2 2 0 0 0 2-2v-2" />
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="m15 15-2.086-2.086" />
+                    <path d="M12 2v2M12 20v2M22 12h-2M4 12H2" />
+                </svg>
+                <span>product_analyzer</span>
+            </a>
+            <a href="gov_subsidy.html" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon">
+                    <path d="M12 22v-6"></path>
+                    <path d="M6 16v-6"></path>
+                    <path d="M18 16v-6"></path>
+                    <path d="M4 10h16"></path>
+                    <path d="M3 22h18"></path>
+                    <path d="M12 2L4 7v3h16V7L12 2z"></path>
+                </svg>
+                <span>Govt. Subsidies</span>
+            </a>
+
+
+            <div class="sidebar-dropdown">
+                <a href="#" class="sidebar-link sidebar-dropdown-toggle group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="sidebar-icon">
+                        <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                        </path>
+                        <path d="M2 9.27l10 2.5 10-2.5"></path>
+                        <path d="M12 17.77V22"></path>
+                    </svg>
+                    <span>Crops</span>
+                    <svg class="dropdown-arrow ml-auto h-5 w-5 transition-transform duration-300"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </a>
+                <div class="sidebar-submenu">
+                    <a href="banana_details.html" class="sidebar-submenu-link">Banana</a>
+                    <a href="muskmelon_details.html" class="sidebar-submenu-link">Muskmelon</a>
+                </div>
+            </div>
+
+            <span class="nav-section-title">Account</span>
+            <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>My Profile</span>
+            </a>
+            <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="sidebar-icon">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                    <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>&copy; 2025 AgroSphere</p>
+        </div>
+    </aside>
+    <header id="navbar" class="fixed top-0 left-0 w-full z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" id="logo-btn"
+                class="flex items-center space-x-2 text-white transition-transform hover:scale-105 z-50">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="#16a34a" />
+                    <path
+                        d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                        fill="#22c55e" />
+                </svg>
+                <span class="text-3xl font-bold">AgroSphere</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="advisory.html" class="nav-link">AI Advisor</a>
+                <a href="leaftest.html" class="nav-link">LeafLens</a>
+                <a href="pest_management.html" class="nav-link">Crop Planner</a>
+                <a href="gov_subsidy.html" class="nav-link">Subsidies</a>
+                <a href="market.html" class="nav-link">Market Prices</a>
+                <a href="wether.html" class="nav-link">Weather</a>
+                <a href="index.html#about" class="nav-link">About</a>
+                <a href="index.html#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Auth Links - Swapped by JS -->
+                <div id="auth-links" class="flex items-center space-x-4">
+                    <a href="login.html" class="btn btn-outline hidden sm:block">Login</a>
+                    <a href="register.html" class="btn btn-solid">Register</a>
+                </div>
+                <!-- User Profile - Hidden by default -->
+                <div id="user-profile" class="hidden items-center space-x-4">
+                    <span id="user-email" class="text-sm font-semibold"></span>
+                    <button id="logout-btn" class="btn btn-outline">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-16 mt-16">
+        <section id="schemes-section">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-extra">Government Schemes & Subsidies</h1>
+                <p class="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">Explore key government initiatives designed to support Indian farmers with financial aid, insurance, and resources.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Scheme Card 1: PM-KISAN -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V6.375c0-.621.504-1.125 1.125-1.125h.375m18 3.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75m0 0h.375c.621 0 1.125.504 1.125 1.125v.375m-18 0h-.375a1.125 1.125 0 0 0-1.125 1.125v.375m18 0v-.75a.75.75 0 0 0-.75-.75h-.75a.75.75 0 0 0-.75.75v.75m0 0h.375c.621 0 1.125.504 1.125 1.125v.375m-18 0h-.375a1.125 1.125 0 0 0-1.125 1.125v.375M12 12.75h3m-3 0h-3m3 0v3m0 0v-3m0 0H9m3 0h3m-3 0a.75.75 0 0 0-1.5 0v3a.75.75 0 0 0 1.5 0v-3Z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">PM-KISAN Scheme</h3>
+                    <p class="text-gray-600 flex-grow">Provides income support of ₹6,000 per year in three equal installments to all land-holding farmer families.</p>
+                    <a href="https://pmkisan.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- Scheme Card 2: Fasal Bima Yojana -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 150ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 1.07-1.07m5.585 5.585a3.75 3.75 0 0 1-5.303 0m5.303-5.303a3.75 3.75 0 0 0-5.303 0m0 0L9 12.75m5.585 5.585-5.585-5.585m0 0a3.75 3.75 0 1 0-5.303-5.303m5.303 5.303a3.75 3.75 0 1 1 5.303 5.303m0 0a3.75 3.75 0 0 0 5.303 0m-5.303-5.303a3.75 3.75 0 0 1 5.303 0" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Pradhan Mantri Fasal Bima Yojana</h3>
+                    <p class="text-gray-600 flex-grow">Offers insurance coverage and financial support to farmers in the event of failure of any of the notified crops as a result of natural calamities, pests or diseases.</p>
+                    <a href="https://pmfby.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- Scheme Card 3: Soil Health Card -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 300ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Soil Health Card Scheme</h3>
+                    <p class="text-gray-600 flex-grow">Provides farmers with soil health cards, which carry crop-wise recommendations of nutrients and fertilizers required for individual farms to improve productivity.</p>
+                    <a href="https://soilhealth.dac.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+                
+                 <!-- Scheme Card 4: Paramparagat Krishi Vikas Yojana -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                       <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Paramparagat Krishi Vikas Yojana</h3>
+                    <p class="text-gray-600 flex-grow">Promotes organic farming through the adoption of organic villages and Participatory Guarantee System (PGS) certification, providing financial assistance for inputs, seeds, and marketing.</p>
+                    <a href="https://pgsindia-ncof.gov.in/pkvy/index.html" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- Scheme Card 5: e-NAM -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 150ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                       <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">e-NAM (National Agriculture Market)</h3>
+                    <p class="text-gray-600 flex-grow">An online trading platform for agricultural commodities. It aims to create better marketing opportunities for farmers to sell their products through a competitive and transparent price discovery system.</p>
+                    <a href="https://www.enam.gov.in/web/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- Scheme Card 6: Kisan Credit Card -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 300ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                       <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Kisan Credit Card (KCC) Scheme</h3>
+                    <p class="text-gray-600 flex-grow">Aims at providing adequate and timely credit support from the banking system to farmers for their cultivation and other needs, including post-harvest expenses and consumption requirements.</p>
+                    <a href="https://www.sbi.co.in/web/agri-rural/agriculture-banking/crop-finance/kisan-credit-card-kcc-" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- NEW Scheme Card 7: PM-KUSUM Yojana -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">PM-KUSUM Yojana</h3>
+                    <p class="text-gray-600 flex-grow">Aims to ensure energy security for farmers, by providing financial support to install solar pumps and grid-connected solar and other renewable energy power plants.</p>
+                    <a href="https://pmkusum.mnre.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- NEW Scheme Card 8: Agri Infrastructure Fund -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 150ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6h1.5m-1.5 3h1.5m-1.5 3h1.5M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Agriculture Infrastructure Fund</h3>
+                    <p class="text-gray-600 flex-grow">Provides financing for post-harvest management infrastructure and community farming assets, such as warehouses, cold storage, and processing units.</p>
+                    <a href="https://agriinfra.dac.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                <!-- NEW Scheme Card 9: RKVY-RAFTAAR -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate" style="transition-delay: 300ms;">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                       <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">Rashtriya Krishi Vikas Yojana</h3>
+                    <p class="text-gray-600 flex-grow">Provides states with the autonomy to plan and execute schemes for agriculture and allied sectors, focusing on remunerative approaches and overall development.</p>
+                    <a href="https://rkvy.nic.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+
+                 <!-- NEW Scheme Card 10: NMSA -->
+                <div class="scheme-card bg-white p-8 rounded-lg border border-gray-200 shadow-sm flex flex-col scroll-animate">
+                    <div class="icon-wrapper mb-5 inline-block p-4 bg-green-100 rounded-full self-start">
+                        <svg class="w-10 h-10 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 16.5v2.25m0-18.75 5.25.625m-10.5 0L12 3m0 18.75 5.25-.625m-10.5 0L12 21m0-18.75c-3.182 0-6.162 1.25-8.375 3.375m16.75 0c-2.213-2.125-5.193-3.375-8.375-3.375m0 0V12m0 9.125c3.182 0 6.162-1.25 8.375-3.375m-16.75 0c2.213 2.125 5.193 3.375 8.375 3.375m0 0V12m0-9.125a9.375 9.375 0 0 1 9.375 9.375m-18.75 0A9.375 9.375 0 0 1 12 3m0 18.75a9.375 9.375 0 0 1-9.375-9.375m18.75 0A9.375 9.375 0 0 1 12 21.001" /></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-text-dark mb-3">National Mission for Sustainable Agriculture</h3>
+                    <p class="text-gray-600 flex-grow">Aims to enhance agricultural productivity, especially in rainfed areas, by focusing on integrated farming, water use efficiency, and soil health management.</p>
+                    <a href="https://nmsa.dac.gov.in/" target="_blank" class="mt-6 font-bold text-primary hover:text-primary-dark transition-colors self-start">Learn More & Apply &rarr;</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-dark-bg text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                                fill="#16a34a"></path>
+                            <path
+                                d="M12 6C9.17 6 6.84 7.63 5.5 10.04C6.87 8.5 8.83 7.5 11 7.5V10.5L14.5 7L11 3.5V6.5C10.5 6.5 10 6.5 9.5 6.5C8.81 6.5 8.16 6.62 7.55 6.81C8.83 5.67 10.41 5 12 5C13.59 5 15.17 5.67 16.45 6.81C17.16 6.62 17.81 6.5 18.5 6.5C19 6.5 19.5 6.5 20 6.5V3.5L16.5 7L20 10.5V7.5C18.17 7.5 16.13 8.5 14.5 10.04C13.16 7.63 10.83 6 12 6Z"
+                                fill="#22c55e"></path>
+                        </svg>
+                        <span class="text-2xl font-bold">AgroSphere</span>
+                    </a>
+                    <p class="mt-4 text-gray-400">Pioneering the future of agriculture with data-driven insights and
+                        sustainable practices.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Quick Links</h4>
+                    <div class="flex space-x-8">
+                        <ul class="space-y-2">
+                            <li><a href="index.html" class="hover:text-primary transition">Home</a></li>
+                            <li><a href="advisory.html" class="hover:text-primary transition">AI Advisor</a></li>
+                            <li><a href="leaftest.html" class="hover:text-primary transition">LeafLens</a></li>
+                            <li><a href="pest_management.html" class="hover:text-primary transition">Crop Planner</a></li>
+                            <li><a href="gov_subsidy.html" class="hover:text-primary transition">Subsidies</a></li>
+                        </ul>
+                        <ul class="space-y-2">
+                            <li><a href="market.html" class="hover:text-primary transition">Market Prices</a></li>
+                            <li><a href="wether.html" class="hover:text-primary transition">Weather</a></li>
+                            <li><a href="index.html#about" class="hover:text-primary transition">About</a></li>
+                            <li><a href="index.html#contact" class="hover:text-primary transition">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start"><span class="mr-2 mt-1">📍</span> 123 AgriTech Avenue, Green
+                            Valley, State 12345</li>
+                        <li class="flex items-center"><span class="mr-2">📞</span> +1 (555) 123-4567</li>
+                        <li class="flex items-center"><span class="mr-2">✉️</span> info@agrosphere.com</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M22.675 0h-21.35C.602 0 0 .602 0 1.348v21.304C0 23.398.602 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h5.713c.722 0 1.325-.602 1.325-1.348V1.348C24 .602 23.398 0 22.675 0z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.223.085c.645 1.956 2.52 3.379 4.734 3.419-1.71 1.332-3.86 2.125-6.204 2.125-.402 0-.799-.023-1.19-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.668-.072-4.948-.2-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z" />
+                            </svg></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition"><svg class="w-6 h-6"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
+                            </svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-500">
+                <p>&copy; 2025 AgroSphere. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+<script src="script.js"></script>
+
+</body>
+</html>
+
